@@ -28,6 +28,7 @@ Common variables referenced in naming standards
 |:--------------------|:----------------------------|:--------|:------------------------|
 | ASG Security Groups | `<app_name>`                |         | `web-api`               |
 | ASG Launch Config   | `<app_name>-lc-<timestamp>` |         | `web-api-lc-1537774225` |
+<<<<<<< HEAD
 | ASG Launch Template | `<app_name>-lt-<timestamp>` |         | `web-api-lt-1537774225` |
 
 ---
@@ -83,4 +84,26 @@ Let's create an `ALB` and the related resources needed (security groups, listene
 > :point_up: Think about what's the best metric to use in order to adjust the size of the Autoscaling group
 
 * [aws_autoscaling_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_policy)
+=======
+
+## 1. Create an `ALB`
+
+TODO Cloudcraft diagram
+
+## Inputs
+
+| Name                  | Description                                                    |  Type  |  Default   | Required |
+|:----------------------|:---------------------------------------------------------------|:------:|:----------:|:--------:|
+| app_count             | Number of application instances desired                        | string |    `1`     |    no    |
+| app_instance_type     | Type of instance to use for the application                    | string | `t2.micro` |    no    |
+| app_key_name          | Name of the keypair to use for the application                 | string |     -      |   yes    |
+| app_name              | Name of the application                                        | string |     -      |   yes    |
+| app_root_block_device | An EBS block device block definition to use by the application | string |  `<map>`   |    no    |
+| app_tags              | Set of tags to apply to the application                        | string |  `<map>`   |    no    |
+| aws_profile           |                                                                | string |     -      |   yes    |
+| aws_region            |                                                                | string |     -      |   yes    |
+| vpc_name              | VPC Name                                                       | string |     -      |   yes    |
+
+*Based on [standard module structure](https://www.terraform.io/docs/modules/create.html#standard-module-structure) guidelines*
+>>>>>>> 1d0185a... Push stable asg
 
