@@ -5,4 +5,3 @@ output "alb_endpoint" {
 output "alb_instances" {
   value = ["${aws_instance.api.*.public_dns}"]
 }
-

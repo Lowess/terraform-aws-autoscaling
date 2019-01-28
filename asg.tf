@@ -73,15 +73,17 @@ resource "aws_instance" "api" {
 }
 
 resource aws_lb_target_group_attachment "api_http" {
-  count            = "${var.app_count}"
-  target_group_arn = "${aws_lb_target_group.alb_tg_http.arn}"
-  target_id        = "${element(aws_instance.api.*.id, count.index)}"
-  port             = 8080
+  count                 = "${var.app_count}"
+  target_group_arn      = "${aws_lb_target_group.alb_tg_http.arn}"
+  target_id             = "${element(aws_instance.api.*.id, count.index)}"
+  port                  = 8080
+  create_before_destroy = true
 }
 
 resource aws_lb_target_group_attachment "api_netdata" {
-  count            = "${var.app_count}"
-  target_group_arn = "${aws_lb_target_group.alb_tg_netdata.arn}"
-  target_id        = "${element(aws_instance.api.*.id, count.index)}"
-  port             = 19999
+  count                 = "${var.app_count}"
+  target_group_arn      = "${aws_lb_target_group.alb_tg_netdata.arn}"
+  target_id             = "${element(aws_instance.api.*.id, count.index)}"
+  port                  = 19999
+  create_before_destroy = true
 }
