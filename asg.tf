@@ -68,6 +68,8 @@ resource "aws_instance" "api" {
   vpc_security_group_ids = ["${local.ops_sg}", "${aws_security_group.api.id}"]
   tags                   = "${merge(var.app_tags,
     map("Name", format("%s-%02d", var.app_name, count.index)))}"
+
+  depends_on = ["aws_lb.alb"]
 }
 
 resource aws_lb_target_group_attachment "api_http" {
