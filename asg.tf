@@ -89,7 +89,6 @@ resource aws_lb_target_group_attachment "api_netdata" {
   target_group_arn      = "${aws_lb_target_group.alb_tg_netdata.arn}"
   target_id             = "${element(aws_instance.api.*.id, count.index)}"
   port                  = 19999
-  create_before_destroy = true
 
   lifecycle {
     create_before_destroy = true
