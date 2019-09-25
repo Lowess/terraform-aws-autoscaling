@@ -12,6 +12,11 @@ variable "app_name" {
   description = "Name of the application"
 }
 
+variable "app_ami_name" {
+  type        = "string"
+  description = "AMI Name of the application"
+}
+
 variable "app_tags" {
   default     = {}
   description = "Set of tags to apply to the application"
