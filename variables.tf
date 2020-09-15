@@ -12,8 +12,13 @@ variable "app_name" {
   description = "Name of the application"
 }
 
+variable "app_ami_owner" {
+  type        = string
+  description = "Account Id owner of the AMI"
+}
+
 variable "app_ami_name" {
-  type        = "string"
+  type        = string
   description = "AMI Name of the application"
 }
 
@@ -28,6 +33,7 @@ variable "app_count" {
 }
 
 variable "app_instance_type" {
+  type        = string
   default     = "t2.micro"
   description = "Type of instance to use for the application"
 }

@@ -1,13 +1,7 @@
 ### Backend definition
 
-terraform {
-  # The configuration for this backend will be filled in by Terragrunt
-  backend "s3" {}
-}
-
 provider "aws" {
-  region  = "${var.aws_region}"
-  profile = "${var.aws_profile}"
+  region = var.aws_region
 }
 
 ### Module Main
@@ -17,19 +11,27 @@ provider "aws" {
 ######################################################################
 
 module "discovery" {
-  source              = "github.com/Lowess/terraform-aws-discovery"
-  aws_region          = "${var.aws_region}"
-  vpc_name            = "${var.vpc_name}"
-  ec2_ami_names       = ["${var.app_ami_name}"]
+  source              = "github.com/Lowess/terraform-aws-discovery?ref=master"
+  aws_region          = var.aws_region
+  vpc_name            = var.vpc_name
+  ec2_ami_names       = [var.app_ami_name]
   ec2_security_groups = ["ops"]
-}
-
-locals {
-  app_ami_id  = "${module.discovery.images_id[0]}"
-  app_subnets = "${module.discovery.public_subnets}"
-  ops_sg      = "${module.discovery.security_groups_json["ops"]}"
+  ec2_ami_owners      = var.app_ami_owner
 }
 
 data "http" "whatismyip" {
-  url = "http://icanhazip.com"
+  url = "https://ifconfig.co/json"
+  request_headers = {
+    Accept = "application/json"
+  }
 }
+
+locals {
+  app_ami_id  = module.discovery.images_id[0]
+  app_subnets = module.discovery.public_subnets
+  app_azs     = keys(module.discovery.public_subnets_json)
+  ops_sg      = module.discovery.security_groups_json["ops"]
+
+  my_ip = jsondecode(data.http.whatismyip.body).ip
+}
+
