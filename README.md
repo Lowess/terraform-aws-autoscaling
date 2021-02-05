@@ -77,33 +77,32 @@ Let's create an `ALB` and the related resources needed (security groups, listene
 
 ![ALB & ASG](./docs/2-alb-asg.png)
 
-## [BONUS] 3. Create policies to make the `AWS Autoscaling group` scale in/out
+## 3. Run a stress test on your `AWS Load balancer`
+
+> You can test your load test your ALB using a load testing tool like [Vegeta](https://github.com/tsenart/vegeta)
+
+```bash
+# Adjust ALB DNS
+export ALB_DNS="http://website-alb-public-1736876885.us-east-1.elb.amazonaws.com/"
+
+# Run stress test with 50 / 100 / 150 Request per seconds
+for RATE in {50..150..50}; do
+  echo "Stressing with ${RATE} RPS";
+  echo "GET ${ALB_DNS}" | vegeta attack -name=${RATE}qps -rate=${RATE} -duration=10s > "results.${RATE}qps.bin"
+done
+
+# Generate HTML report
+vegeta plot results.50qps.bin results.100qps.bin results.150qps.bin > plot.html
+
+# Visualize results in web browser
+open plot.html
+```
+
+## [BONUS] 4. Create policies to make the `AWS Autoscaling group` scale in/out
+
 
 * Visit the `Cloudwatch` service and discover what this service does
 
 > :point_up: Think about what's the best metric to use in order to adjust the size of the Autoscaling group
 
 * [aws_autoscaling_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_policy)
-=======
-
-## 1. Create an `ALB`
-
-TODO Cloudcraft diagram
-
-## Inputs
-
-| Name                  | Description                                                    |  Type  |  Default   | Required |
-|:----------------------|:---------------------------------------------------------------|:------:|:----------:|:--------:|
-| app_count             | Number of application instances desired                        | string |    `1`     |    no    |
-| app_instance_type     | Type of instance to use for the application                    | string | `t2.micro` |    no    |
-| app_key_name          | Name of the keypair to use for the application                 | string |     -      |   yes    |
-| app_name              | Name of the application                                        | string |     -      |   yes    |
-| app_root_block_device | An EBS block device block definition to use by the application | string |  `<map>`   |    no    |
-| app_tags              | Set of tags to apply to the application                        | string |  `<map>`   |    no    |
-| aws_profile           |                                                                | string |     -      |   yes    |
-| aws_region            |                                                                | string |     -      |   yes    |
-| vpc_name              | VPC Name                                                       | string |     -      |   yes    |
-
-*Based on [standard module structure](https://www.terraform.io/docs/modules/create.html#standard-module-structure) guidelines*
->>>>>>> 1d0185a... Push stable asg
-

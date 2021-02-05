@@ -30,16 +30,6 @@ resource "aws_security_group_rule" "alb_tcp_80_world" {
   security_group_id = aws_security_group.alb.id
 }
 
-# Configuration of the firewall - ALB <-> MyIp
-resource "aws_security_group_rule" "alb_tcp_19999_myip" {
-  type              = "ingress"
-  from_port         = 19999
-  to_port           = 19999
-  protocol          = "tcp"
-  cidr_blocks       = ["${trimspace(local.my_ip)}/32"]
-  security_group_id = aws_security_group.alb.id
-}
-
 ######################################################################
 ## EC2 ALB
 ######################################################################
@@ -61,12 +51,12 @@ resource "aws_lb" "alb" {
 # Create a target group for HTTP
 resource "aws_lb_target_group" "alb_tg_http" {
   name     = "${var.app_name}-http"
-  port     = 80
+  port     = var.app_port
   protocol = "HTTP"
   vpc_id   = module.discovery.vpc_id
 
   health_check {
-    path                = "/heartbeat"
+    path                = "/index.html"
     healthy_threshold   = 2
     unhealthy_threshold = 4
     interval            = 15

@@ -2,7 +2,7 @@
 ## Security groups
 ######################################################################
 
-resource "aws_security_group" "api" {
+resource "aws_security_group" "asg" {
   vpc_id      = module.discovery.vpc_id
   name        = var.app_name
   description = "${var.app_name} - Security group"
@@ -18,37 +18,46 @@ resource "aws_security_group" "api" {
 }
 
 # Configuration of the firewall - Instances <-> ALB
-resource "aws_security_group_rule" "api_tcp_80_alb" {
+resource "aws_security_group_rule" "asg_tcp_alb" {
   type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
+  from_port                = var.app_port
+  to_port                  = var.app_port
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.alb.id
-  security_group_id        = aws_security_group.api.id
+  security_group_id        = aws_security_group.asg.id
 }
 
 # Configuration of the firewall - Instances <-> MyIp (Debugging purposes)
-resource "aws_security_group_rule" "api_tcp_80_myip" {
+resource "aws_security_group_rule" "asg_tcp_myip" {
   type              = "ingress"
-  from_port         = 80
-  to_port           = 80
+  from_port         = var.app_port
+  to_port           = var.app_port
   protocol          = "tcp"
   cidr_blocks       = ["${local.my_ip}/32"]
-  security_group_id = aws_security_group.api.id
+  security_group_id = aws_security_group.asg.id
+}
+
+# SSH access
+resource "aws_security_group_rule" "asg_ssh_myip" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["${local.my_ip}/32"]
+  security_group_id = aws_security_group.asg.id
 }
 
 ######################################################################
 ## Launch instances
 ######################################################################
 
-resource "aws_launch_template" "api" {
+resource "aws_launch_template" "asg" {
   name_prefix   = "${var.app_name}-asg"
   image_id      = local.app_ami_id
   instance_type = var.app_instance_type
   key_name      = var.app_key_name
   vpc_security_group_ids = [
-    local.ops_sg,
-    aws_security_group.api.id
+    aws_security_group.asg.id
   ]
 
   tag_specifications {
@@ -60,13 +69,14 @@ resource "aws_launch_template" "api" {
   }
 }
 
-resource "aws_autoscaling_group" "api" {
-  desired_capacity = 1
-  max_size         = 1
-  min_size         = 1
+resource "aws_autoscaling_group" "asg" {
+  name_prefix = "${var.app_name}-"
+  desired_capacity = var.app_desired_size
+  max_size         = var.app_max_size
+  min_size         = var.app_min_size
 
   launch_template {
-    id      = aws_launch_template.api.id
+    id      = aws_launch_template.asg.id
     version = "$Latest"
   }
 

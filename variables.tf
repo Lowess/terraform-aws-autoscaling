@@ -12,6 +12,11 @@ variable "app_name" {
   description = "Name of the application"
 }
 
+variable "app_port" {
+  type        = number
+  default     = 8080
+  description = "The port the application is listening on"
+}
 variable "app_ami_owner" {
   type        = string
   description = "Account Id owner of the AMI"
@@ -27,9 +32,19 @@ variable "app_tags" {
   description = "Set of tags to apply to the application"
 }
 
-variable "app_count" {
-  default     = 1
-  description = "Number of application instances desired"
+variable "app_desired_size" {
+  default     = 0
+  description = "Desired number of application instances in the ASG"
+}
+
+variable "app_min_size" {
+  default     = 0
+  description = "Minimum number of application instances in the ASG"
+}
+
+variable "app_max_size" {
+  default     = 3
+  description = "Maximum number of application instances in the ASG"
 }
 
 variable "app_instance_type" {
